@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Margao Fitness & Strength Club — Membership Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header & Filter Controls -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-badge">MF</div>
+        <div>
+          <h1>Margao Fitness &amp; Strength Club</h1>
+          <p class="subtitle">Colva Road, Margao, Goa &bull; Membership &amp; Attendance Analytics</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label for="monthFilter">Month</label>
+          <select id="monthFilter" aria-label="Filter by Month">
+            <option value="ALL">All 6 Months (Jun–Nov 2026)</option>
+            <option value="2026-06">June 2026</option>
+            <option value="2026-07">July 2026</option>
+            <option value="2026-08">August 2026</option>
+            <option value="2026-09">September 2026</option>
+            <option value="2026-10">October 2026</option>
+            <option value="2026-11" selected>November 2026</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="classFilter">Class</label>
+          <select id="classFilter" aria-label="Filter by Class">
+            <option value="ALL">All Classes</option>
+            <option value="HIIT">HIIT</option>
+            <option value="CrossFit">CrossFit</option>
+            <option value="Yoga">Yoga</option>
+            <option value="Zumba">Zumba</option>
+            <option value="Strength Training">Strength Training</option>
+            <option value="Spin">Spin</option>
+          </select>
+        </div>
+
+        <button id="exportCsvBtn" class="btn btn-primary" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI Stat Cards -->
+    <section class="kpi-grid" aria-label="Key Performance Indicators">
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Active Members</span>
+          <span id="kpiActiveTrend" class="badge badge-up">+0.0%</span>
+        </div>
+        <div id="kpiActiveValue" class="kpi-value">0</div>
+        <div id="kpiActiveSub" class="kpi-sub">Total valid memberships</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">New Joiners</span>
+          <span id="kpiJoinersBadge" class="badge badge-neutral">Selected Period</span>
+        </div>
+        <div id="kpiJoinersValue" class="kpi-value">0</div>
+        <div id="kpiJoinersSub" class="kpi-sub">Onboarded in period</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Avg. Attendance Rate</span>
+          <span id="kpiAttendanceBadge" class="badge badge-info">Check-ins / Cap</span>
+        </div>
+        <div id="kpiAttendanceValue" class="kpi-value">0%</div>
+        <div id="kpiAttendanceSub" class="kpi-sub">0 total check-ins</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Revenue (INR)</span>
+          <span id="kpiRevenueBadge" class="badge badge-up">Paid Invoices</span>
+        </div>
+        <div id="kpiRevenueValue" class="kpi-value">&#8377;0</div>
+        <div id="kpiRevenueSub" class="kpi-sub">Across 0 transactions</div>
+      </article>
+    </section>
+
+    <!-- Pure HTML5 Canvas Charts -->
+    <section class="charts-grid">
+      <article class="panel chart-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Membership Growth Trend</h2>
+            <p id="growthChartSub" class="panel-sub">Active members &amp; new joiners (Jun – Nov 2026)</p>
+          </div>
+          <div class="legend">
+            <span class="legend-item"><i class="dot dot-emerald"></i>Active</span>
+            <span class="legend-item"><i class="dot dot-amber"></i>New Joiners</span>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="growthCanvas"></canvas>
+          <div id="growthTooltip" class="canvas-tooltip" hidden></div>
+        </div>
+      </article>
+
+      <article class="panel chart-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Attendance by Class</h2>
+            <p id="classChartSub" class="panel-sub">Click a bar to filter by class</p>
+          </div>
+          <button id="resetClassBtn" class="btn-link" type="button" hidden>Clear Class Filter</button>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="attendanceCanvas"></canvas>
+          <div id="attendanceTooltip" class="canvas-tooltip" hidden></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Expiring Memberships Table -->
+    <section class="panel table-panel">
+      <div class="panel-header table-header">
+        <div>
+          <h2>Expiring Memberships Watchlist</h2>
+          <p id="tableSummary" class="panel-sub">Sorted chronologically by expiry date</p>
+        </div>
+        <div class="table-actions">
+          <input
+            type="search"
+            id="memberSearch"
+            placeholder="Search member or ID..."
+            aria-label="Search member by name or ID"
+          />
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Member ID</th>
+              <th>Name</th>
+              <th>Primary Class</th>
+              <th>Plan</th>
+              <th>Expiry Date</th>
+              <th>Fee Paid</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="membersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Load data first, then application logic -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
